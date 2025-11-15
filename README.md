@@ -73,7 +73,7 @@ nano .env
 BOT_TOKEN=your_bot_token_here
 
 # 您的Telegram话题群组ID
-# 将机器人设为群组管理员后，在群组里发送 /start ，机器人会自动回复群组ID
+# 将机器人设为群组管理员后，在群组里发送 /getid ，机器人会自动回复群组ID
 FORUM_GROUP_ID=-1001234567890
 
 # 管理员ID（您的Telegram用户ID），多个ID用逗号分隔
@@ -204,17 +204,18 @@ python bot.py
 ### 🔑 获取必要信息
 
 1.  **Bot Token**: 在 Telegram 中与 [@BotFather](https://t.me/BotFather) 对话，使用 `/newbot` 命令创建机器人即可获得。
-2.  **话题群组 ID**: 创建一个超级群组 (Supergroup)，在设置中启用“话题”(Topics) 功能。然后将您的机器人添加为该群组的管理员。在群组中发送任意消息，机器人会自动回复包含群组 ID 的信息。
+2.  **话题群组 ID**: 创建一个超级群组 (Supergroup)，在设置中启用“话题”(Topics) 功能。然后将您的机器人添加为该群组的管理员。在群组中发送/getid，机器人会自动回复包含群组 ID 的信息。
 3.  **Gemini API 密钥** (可选): 访问 [Google AI Studio](https://aistudio.google.com/api-keys) 创建并复制您的 API 密钥。
 
 ### 📜 命令列表
 
 #### 用户命令
 - `/start` - 启动机器人，显示欢迎信息。
+- `/getid` - 显示当前用户/群组ID。
 - `/help` - 显示帮助信息。
 
 #### 管理员命令
-- `/block <user_id> [reason]` - 拉黑指定用户。
+- `/block` - 对应话题直接发送永久拉黑用户。
 - `/blacklist` - 查看当前的黑名单列表。
 - `/stats` - 查看机器人运行统计信息。
 
