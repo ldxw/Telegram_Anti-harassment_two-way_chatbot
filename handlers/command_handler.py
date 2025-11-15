@@ -110,3 +110,18 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     await update.message.reply_text(stats_message, parse_mode='Markdown')
+
+async def getid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_type = update.effective_chat.type
+    user_id = update.effective_user.id
+
+    if chat_type == 'private':
+        message = f"用户ID: `{user_id}`"
+    else:
+        chat_id = update.effective_chat.id
+        message = (
+            f"群组ID: `{chat_id}`\n"
+            f"用户ID: `{user_id}`"
+        )
+    
+    await update.message.reply_text(message, parse_mode='Markdown')

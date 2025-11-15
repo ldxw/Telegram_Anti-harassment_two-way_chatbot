@@ -6,7 +6,8 @@ load_dotenv()
 class Config:
     
     BOT_TOKEN = os.getenv('BOT_TOKEN')
-    BOT_ID = None 
+    BOT_ID = None
+    BOT_USERNAME = None
     FORUM_GROUP_ID = int(os.getenv('FORUM_GROUP_ID', 0))
     ADMIN_IDS = [int(id) for id in os.getenv('ADMIN_IDS', '').split(',') if id]
     
