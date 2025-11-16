@@ -150,6 +150,13 @@ wget https://raw.githubusercontent.com/Hamster-Prime/Telegram_Anti-harassment_tw
 ```bash
 docker compose up -d
 ```
+
+更新容器：
+```bash
+docker-compose down
+docker-compose pull
+docker-compose up -d
+```
 ---
 ### 使用 Docker Run
 
