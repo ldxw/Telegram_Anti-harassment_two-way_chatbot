@@ -132,6 +132,13 @@ MAX_MESSAGES_PER_SECOND=30
 
 # Bot每分钟在群组中最大发送消息数
 MAX_GROUP_MESSAGES_PER_MINUTE=20
+
+# -- Watchtower 通知钩子（默认禁用，启用需去除配置的#注释） --
+# Watchtower 使用 shoutrrr 作为统一通知系统（支持包括 Telegram 在内的等多种渠道）
+#WATCHTOWER_NOTIFICATIONS=shoutrrr
+
+# 填入 通知渠道 的钩子（以 Telegram 举例）
+#WATCHTOWER_NOTIFICATION_URL=telegram://token@telegram?chats=channel-1[,chat-id-1,...]
 ```
 </details>
 
@@ -150,6 +157,16 @@ wget https://raw.githubusercontent.com/Hamster-Prime/Telegram_Anti-harassment_tw
 ```bash
 docker compose up -d
 ```
+
+更新容器：
+```bash
+# 在tg-bot-data目录下，执行以下命令
+docker-compose down
+docker-compose pull
+docker-compose up -d
+```
+
+[使用 Watchtower 自动更新本项目](watchtower/README.md)
 ---
 ### 使用 Docker Run
 
@@ -242,7 +259,7 @@ python bot.py
 
 ## 🔧 配置说明
 
-所有配置项均通过 `.env` 文件进行管理。详细的变量说明请参考 [快速开始](#-快速开始-推荐使用-docker) 部分的 `.env` 文件示例。
+所有配置项均通过 `.env` 文件进行管理。详细的变量说明请参考 [快速开始](#-快速开始-docker-推荐) 部分的 `.env` 文件示例。
 
 ---
 
