@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, constants
 from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 from database import models as db
@@ -10,8 +10,22 @@ from utils.message_sender import send_message_by_type
 from services.rate_limiter import rate_limiter
 from config import config
 
+async def handle_invalid_thread(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: int):
+    await db.update_user_thread_id(user_id, None)
+    await db.update_user_verification(user_id, False)
+    context.user_data['pending_update'] = update
+    question, keyboard = await create_verification(user_id)
+    full_message = (
+        "您的话题已被关闭，请重新进行验证以发送消息。\n\n"
+        f"{question}"
+    )
+    await update.message.reply_text(
+        text=full_message,
+        reply_markup=keyboard
+    )
+
 async def _resend_message(update: Update, context: ContextTypes.DEFAULT_TYPE, thread_id: int):
-    await send_message_by_type(context.bot, update.message, config.FORUM_GROUP_ID, thread_id, True)
+    return await send_message_by_type(context.bot, update.message, config.FORUM_GROUP_ID, thread_id, True)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     from network_test.handlers import handle_message as network_handle_message
@@ -159,6 +173,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     try:
+        probe_msg = await context.bot.forward_message(
+            chat_id=config.FORUM_GROUP_ID,
+            from_chat_id=config.FORUM_GROUP_ID,
+            message_id=thread_id,
+            message_thread_id=thread_id,
+            disable_notification=True
+        )
+        await context.bot.delete_message(
+            chat_id=config.FORUM_GROUP_ID,
+            message_id=probe_msg.message_id
+        )
+    except BadRequest as e:
+        error_text = e.message.lower()
+        if "message to forward not found" in error_text or \
+           "message not found" in error_text or \
+           "thread not found" in error_text or \
+           "topic not found" in error_text:
+            await handle_invalid_thread(update, context, user.id)
+            return
+        print(f"Topic probe failed with unexpected error: {e}")
+    
+    try:
+        sent_msg = None
         if message.text:
             sent_msg = await context.bot.send_message(
                 chat_id=config.FORUM_GROUP_ID,
@@ -172,19 +209,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _resend_message(update, context, thread_id)
             return
     except BadRequest as e:
-        if "Message thread not found" in e.message:
-            await db.update_user_thread_id(user.id, None)
-            await db.update_user_verification(user.id, False)
-            context.user_data['pending_update'] = update
-            question, keyboard = await create_verification(user.id)
-            full_message = (
-                "您的话题已被关闭，请重新进行验证以发送消息。\n\n"
-                f"{question}"
-            )
-            await update.message.reply_text(
-                text=full_message,
-                reply_markup=keyboard
-            )
+        if "thread not found" in e.message.lower() or "topic not found" in e.message.lower():
+            await handle_invalid_thread(update, context, user.id)
             return
         else:
             print(f"发送消息时发生未知错误: {e}")
